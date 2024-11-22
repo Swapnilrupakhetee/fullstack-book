@@ -1,7 +1,7 @@
 const express = require('express')
-const router=express.Router()
+const router=express.Router() //function to help efficiently manage routes
 const Book=require('../models/book');
-const app=express();
+
 
 
 router.post('/add',async(req,res)=>{
