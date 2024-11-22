@@ -23,5 +23,18 @@ router.post('/add',async(req,res)=>{
     }
 })
 
+router.get('/all',async(req,res)=>{
+    try{
+        const allBooks = await Book.find();
+        res.json(allBooks);
+
+    }
+    catch(err)
+    {
+        res.status(500).json({message: err});
+
+    }
+})
+
 
 module.exports=router;
