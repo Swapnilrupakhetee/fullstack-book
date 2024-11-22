@@ -47,4 +47,35 @@ router.get('/:id',async(req,res)=>{
     }
 })
 
+router.put('/:id',async(req,res)=>{
+    try{
+        console.log(req.params.id);
+        console.log(req.body);
+        const {id}=req.params;
+
+        const updatedData=req.body;
+        const newBook=await Book.findByIdAndUpdate(id,updatedData,{new:true});
+        res.json(newBook);
+
+    }
+    catch(err)
+    {
+        res.status(500).json({message: err});
+    }
+
+}
+)
+
+router.delete("/:id", async(req,res)=>{
+    try{
+        const id=req.params.id;
+        const deletedBook=await Book.findByIdAndDelete(id);
+        res.status(200).json({message:"Book deleted"});
+        
+    }
+    catch(err){
+        res.status(500).json({message: err});
+    }
+})
+
 module.exports=router;
