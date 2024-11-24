@@ -8,6 +8,7 @@ function App() {
   const [data, setData] = useState([]);
   const [ones, setOnes] = useState([]);
   const [id, setId] = useState();
+  const [addNew, setAddNew] = useState({title: "", author: ""});
   useEffect(() => {
     axios
       .get("http://localhost:7000/api/book/all")
@@ -19,7 +20,7 @@ function App() {
       .catch((err) => {
         console.log("The error is:", err);
       });
-  }, []);
+  },[]);
 
   const addi = () => {
     axios
@@ -33,8 +34,34 @@ function App() {
         console.log(err);
       });
   };
-  useEffect(addi, []);
+  
 
+  const handleInput=(event)=>{
+    setAddNew({...addNew,[event.target.name]:event.target.value});
+  }
+
+
+  const hanldeSubmut =(event)=>{
+    event.preventDefault();
+    axios
+      .post(`http://localhost:7000/api/book/add`,addNew)
+      .then((res) => {
+        console.log(res)
+        
+      })
+      axios
+        .get("http://localhost:7000/api/book/all")
+        .then((res) => {
+          setData(res.data);
+          console.log("Updated data fetched:", res.data);
+        })
+      
+      .catch((err) => {
+        console.log(err);
+      });
+    
+
+  }
   return (
     <>
       <div>
@@ -82,6 +109,13 @@ function App() {
             </div>
           
         
+      </div>
+      <div>
+      <h1>Adding New Books</h1>
+      <input type="text" placeholder="Book Name" name="title" onChange={handleInput}/>
+      <input type="text" placeholder="Author Name" name="author" onChange={handleInput} />
+      <button onClick={hanldeSubmut}>Add </button>
+
       </div>
     </>
   );

@@ -19,7 +19,7 @@ router.post('/add',async(req,res)=>{
     }
     catch(err){
         console.log("Error: " + err);
-        res.status(404).send.json({message: err});
+        res.status(404).json({message: err});
     }
 })
 
