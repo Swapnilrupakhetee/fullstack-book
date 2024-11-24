@@ -1,7 +1,7 @@
 const express= require('express');
 const dotenv=require('dotenv').config(); //need to import dotenv
 const PORT=process.env.PORT 
-
+var cors=require('cors');
 const dbConnect=require('../backend/services/dbConnect')
 const router=require('router');
 const bookRoutes =require('./routes/bookRoutes')
@@ -14,6 +14,7 @@ const app=express();
 dbConnect(); 
 
 //Middlewares
+app.use(cors());
 app.use(express.json());  //without parsing the value from req.body and res.body will show as undefined
 
 
