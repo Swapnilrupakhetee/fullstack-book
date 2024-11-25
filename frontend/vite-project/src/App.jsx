@@ -1,121 +1,129 @@
 import { useEffect, useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
 import axios from "axios";
 
 function App() {
   const [data, setData] = useState([]);
   const [ones, setOnes] = useState([]);
-  const [id, setId] = useState();
-  const [addNew, setAddNew] = useState({title: "", author: ""});
+  const [id, setId] = useState("");
+  const [addNew, setAddNew] = useState({ title: "", author: "" });
+  const [edit, setEdit] = useState({ title: "", author: "" });
+  const [editId, setEditId] = useState("");
+
   useEffect(() => {
     axios
       .get("http://localhost:7000/api/book/all")
       .then((res) => {
         setData(res.data);
-        console.log("Got the data");
-        console.log(res.data);
+        console.log("Got the data:", res.data);
       })
       .catch((err) => {
-        console.log("The error is:", err);
+        console.log("Error fetching data:", err);
       });
-  },[]);
+  }, []);
 
   const addi = () => {
     axios
       .get(`http://localhost:7000/api/book/${id}`)
       .then((res) => {
         setOnes(res.data);
-        console.log("Got the Singular data");
-        console.log(res.data);
+        console.log("Got the Singular data:", res.data);
       })
       .catch((err) => {
-        console.log(err);
+        console.log("Error fetching single book:", err);
       });
   };
-  
 
-  const handleInput=(event)=>{
-    setAddNew({...addNew,[event.target.name]:event.target.value});
-  }
+  const handleInput = (event) => {
+    setAddNew({ ...addNew, [event.target.name]: event.target.value });
+  };
 
+  const updateOnChange = (event) => {
+    setEdit({ ...edit, [event.target.name]: event.target.value });
+  };
 
-  const hanldeSubmut =(event)=>{
+  const handleSubmit = (event) => {
     event.preventDefault();
     axios
-      .post(`http://localhost:7000/api/book/add`,addNew)
+      .post(`http://localhost:7000/api/book/add`, addNew)
       .then((res) => {
-        console.log(res)
-        
-      })
-      axios
-        .get("http://localhost:7000/api/book/all")
-        .then((res) => {
+        console.log("Book added:", res.data);
+        axios.get("http://localhost:7000/api/book/all").then((res) => {
           setData(res.data);
           console.log("Updated data fetched:", res.data);
-        })
-      
+        });
+      })
       .catch((err) => {
-        console.log(err);
+        console.log("Error adding book:", err);
       });
-    
+  };
 
-  }
+  const changeValue = (event) => {
+    event.preventDefault();
+    axios
+      .put(`http://localhost:7000/api/book/${editId}`, edit)
+      .then((res) => {
+        console.log("Updated book:", res.data);
+        axios.get("http://localhost:7000/api/book/all").then((res) => {
+          setData(res.data);
+          console.log("Updated data fetched:", res.data);
+        });
+      })
+      .catch((err) => {
+        console.log("Invalid ID to update:", err);
+      });
+  };
+
   return (
     <>
       <div>
         <h1>Getting all the books</h1>
-        <h1>This is the data</h1>
-        {data.map((item, index) => {
-          return (
-            <div key={index}>
-              <div>
-                <b>Title</b>
-              </div>
-              <div>{item.title}</div>
-              <div>
-                <b>id</b>
-              </div>
-              <div>{item._id}</div>
-              <div>
-                <b>Author</b>
-              </div>
-              <div>{item.author}</div>
-              <br />
-              <br />
+        {data.map((item, index) => (
+          <div key={index}>
+            <div>
+              <b>Title</b>: {item.title}
             </div>
-          );
-        })}
+            <div>
+              <b>ID</b>: {item._id}
+            </div>
+            <div>
+              <b>Author</b>: {item.author}
+            </div>
+          </div>
+        ))}
       </div>
+
       <div>
         <h1>Getting a Single Book</h1>
         <input type="text" onChange={(e) => setId(e.target.value)} />
-        <button onClick={addi}>Retrieve</button>{/*Cannot use map function here cause it is a singular object*/}
-       
-            <div key={ones._id}>
-              <div>
-                <b>ID</b>
-              </div>
-              <div>{ones._id}</div>
-              <div>
-                <b>Title</b>
-              </div>
-              <div>{ones.title}</div>
-              <div>
-                <b>author</b>
-              </div>
-              <div>{ones.author}</div>
+        <button onClick={addi}>Retrieve</button>
+        {ones && (
+          <div>
+            <div>
+              <b>ID</b>: {ones._id}
             </div>
-          
-        
+            <div>
+              <b>Title</b>: {ones.title}
+            </div>
+            <div>
+              <b>Author</b>: {ones.author}
+            </div>
+          </div>
+        )}
       </div>
-      <div>
-      <h1>Adding New Books</h1>
-      <input type="text" placeholder="Book Name" name="title" onChange={handleInput}/>
-      <input type="text" placeholder="Author Name" name="author" onChange={handleInput} />
-      <button onClick={hanldeSubmut}>Add </button>
 
+      <div>
+        <h1>Adding New Books</h1>
+        <input type="text" placeholder="Book Name" name="title" onChange={handleInput} />
+        <input type="text" placeholder="Author Name" name="author" onChange={handleInput} />
+        <button onClick={handleSubmit}>Add</button>
+      </div>
+
+      <div>
+        <h1>Updating the Books</h1>
+        <input type="text" placeholder="Book ID" onChange={(e) => setEditId(e.target.value)} />
+        <input type="text" name="title" value={edit.title} onChange={updateOnChange} />
+        <input type="text" name="author" value={edit.author} onChange={updateOnChange} />
+        <button onClick={changeValue}>Edit</button>
       </div>
     </>
   );
