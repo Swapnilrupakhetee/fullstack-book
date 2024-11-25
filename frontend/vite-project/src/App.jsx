@@ -8,6 +8,7 @@ function App() {
   const [addNew, setAddNew] = useState({ title: "", author: "" });
   const [edit, setEdit] = useState({ title: "", author: "" });
   const [editId, setEditId] = useState("");
+  const [deleteId, setDeleteId] = useState("");
 
   useEffect(() => {
     axios
@@ -73,6 +74,24 @@ function App() {
       });
   };
 
+  const deleteOnChange=(e)=>{
+    e.preventDefault();
+    setDeleteId(e.target.value);  
+  }
+
+  const deleteBook=()=>{
+    axios.delete(`http://localhost:7000/api/book/${deleteId}`)
+    .then((res)=>{
+      console.log("Book deleted:", res.data);
+      axios.get("http://localhost:7000/api/book/all").then((res) => {
+        setData(res.data);
+        console.log("Updated data fetched:", res.data);
+      })
+      .catch((err) => {
+        console.log("Error deleting book:", err);
+      });
+    })
+  }
   return (
     <>
       <div>
@@ -124,6 +143,13 @@ function App() {
         <input type="text" name="title" value={edit.title} onChange={updateOnChange} />
         <input type="text" name="author" value={edit.author} onChange={updateOnChange} />
         <button onClick={changeValue}>Edit</button>
+      </div>
+
+      <div>
+      <h1>Deleting a Book</h1>
+      <input type="text" onChange={deleteOnChange}/>
+     <button onClick={deleteBook}>Delete</button>
+
       </div>
     </>
   );
